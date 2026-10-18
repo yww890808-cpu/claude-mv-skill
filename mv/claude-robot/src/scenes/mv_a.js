@@ -44,8 +44,24 @@
     const p = arcPt(from, land, 40 + i * 30, easeIn(k) * .4 + k * .6), bounce = k >= 1 ? 8 * Math.exp(-(t - (T0 + i * .06 + .5)) * 9) * Math.abs(Math.sin((t - (T0 + i * .06 + .5)) * 18)) : 0;
     return { x: p[0], y: p[1] - bounce, rot: lerp(.08, [.25, -.4, .6, 1.57][i], k) };
   }
+  // after the wish a little flower sprouts beside the fallen blocks and opens (不只有挫败: not only failure)
+  const FLOWER_X = 980;
+  function flower(t, g) {
+    const k = easeOut(seg(t, 7.85, 8.3)); if (k <= 0) return;
+    const s = g(FLOWER_X), h = 105 * k, sway = Math.sin(t * 2.2) * 4 * k, top = [s.x + sway, s.y - h];
+    boilSeed('flower');
+    inkLine([[s.x, s.y], [s.x + sway * .5, s.y - h * .5], top], 1.1, '#4F7A36', 'ink', .5);
+    paint(ellPts(s.x + 12 * k, s.y - h * .45, 14 * k, 6 * k, 12, 0, -.5), { wash: '#6FA552', ink: PAL.ink, sw: .6 });
+    const open = backOut(seg(t, 8.05, 8.35));
+    if (open > .02) {
+      glow(top[0], top[1], 90 * open, '#FFD9A0', .5 * open);
+      for (let i = 0; i < 5; i++) { const a = i / 5 * TAU + .3; paint(ellPts(top[0] + Math.cos(a) * 20 * open, top[1] + Math.sin(a) * 20 * open, 17 * open, 12 * open, 12, 0, a), { wash: '#F59AB0', ink: PAL.ink, sw: .6 }); }
+      paint(ellPts(top[0], top[1], 12 * open, 12 * open, 10), { wash: '#F6C14E', ink: PAL.ink, sw: .5 });
+    } else paint(ellPts(top[0], top[1], 7 * k, 9 * k, 10), { wash: '#F59AB0', ink: PAL.ink, sw: .5 });
+  }
   function towerWorld(t, g) {
     const base = g(TOWER_X);
+    flower(t, g);
     for (let i = 0; i < 4; i++) { const b = blockPose(i, t, base); if (b) { boilSeed('blk' + i); MV.block(b.x, b.y, BS, i, b.rot); } }
     return base;
   }
@@ -60,7 +76,7 @@
     const s = g(780), u = 24;
     const hop = jump(t, 5.3, 5.75, 2.2);
     const mood = emotions(t, [[0, 'determined', { lookX: .8 }], [B(7) + .05, 'surprised', { lookX: .8 }], [6.75, 'sad'], [7.15, 'hopeful', { lookY: -1, lookX: .4, emote: null }],
-      [7.7, 'relieved', { eyes: 'closed', mouth: null, aL: .8, aR: .8, emote: 'spark', blush: .2 }]]);
+      [7.7, 'relieved', { eyes: 'closed', mouth: null, aL: .8, aR: .8, emote: 'spark', blush: .2 }], [8.12, 'happy', { lookX: .9, lookY: .7 }]]);
     const view = t < 6.95 ? { view: 'q' } : turn(t, 6.95, 7.12, .125, 0);
     me(s.x, s.y, u, { ...mood, ...view, rot: s.rot, dy: mood.dy + hop.dy, sq: mood.sq + hop.sq, ...(t < 5.75 ? { aL: .9 + .3 * seg(t, 5.2, 5.4), aR: .9 } : {}) });
     // the block balanced on my head, then tossed onto the tower on an arc
@@ -90,7 +106,7 @@
     const bm = emotions(t, [[0, 'excited'], [9.3, 'happy', { aL: .3 + .8 * Math.max(0, Math.sin((t - 9.3) * 9)), aR: .3 }]], { base: BLUE });
     you(bs.x, bs.y, 24, { ...bm, view: t < 9.5 ? 'q' : 'front', flip: true, rot: bs.rot, dy: bm.dy + bj.dy, sq: bm.sq + bj.sq });
     const s = g(780);
-    const mood = emotions(t, [[0, 'relieved', { eyes: 'closed', mouth: null, aL: .8, aR: .8, emote: 'spark', blush: .2 }], [9.18, 'surprised', { lookX: 1 }], [10.25, 'starstruck']]);
+    const mood = emotions(t, [[0, 'happy', { lookX: .9, lookY: .7 }], [9.18, 'surprised', { lookX: 1 }], [10.25, 'starstruck']]);
     me(s.x, s.y, 24, { ...mood, view: t > 9.18 && t < 10.2 ? 'q' : 'front', rot: s.rot });
     if (k > .1) glow(960, 520, 900, '#FFD08A', .35 * k);
     camEnd();
@@ -105,13 +121,13 @@
     if (t < 13.25) {
       const rise = easeIn(seg(t, 12.95, 13.25));
       MV.sky(...GOLD);
-      camBegin(960, 900 - 6 * 26 - 900 * rise, lerp(3.2, 3.6, seg(t, 11.95, 13)) );
+      camBegin(960, 900 - 5.6 * 26 - 900 * rise, lerp(5.2, 5.8, seg(t, 11.95, 13)));
       const mood = emotions(t, [[11.95, 'surprised'], [12.45, 'starstruck', { eyes: 'wide', mouth: 'open' }]]);
       me(960, 900, 26, { ...mood, eyes: 'wide', lookX: 0, lookY: 0, noShadow: true, draw: (u, sw) => {
         // the sea shining inside each eye: a teal band, a gold sun glint and two little wave lines
         for (const sd of [-1, 1]) {
           const ex = sd * 2.5 * u, ey = -6 * u;
-          paint(rrPts(ex - .5 * u, ey + .15 * u, 1 * u, 1 * u, .3 * u), { wash: '#3F8FA8', washOp: 230, ink: null });
+          paint(rrPts(ex - .58 * u, ey + .05 * u, 1.16 * u, 1.25 * u, .3 * u), { wash: '#3F8FA8', washOp: 245, ink: null });
           const ph = t * 2.5;
           inkLine([[ex - .42 * u, ey + .5 * u + Math.sin(ph) * 2], [ex, ey + .38 * u], [ex + .42 * u, ey + .5 * u - Math.sin(ph) * 2]], sw * .35, '#CFF0F2', 'inkfine', .6);
           paint(ellPts(ex + .1 * u, ey + .05 * u, .22 * u, .22 * u, 10), { wash: '#FFD36B', ink: null });
@@ -122,7 +138,7 @@
       return;
     }
     // B: tilt down from the sky onto the sea and our backs
-    const cy = lerp(-120, 540, ease(seg(t, 13.25, 14.1)));
+    const cy = lerp(-60, 540, ease(seg(t, 13.25, 13.85)));
     camBegin(960, cy, 1);
     // the sky is painted in world space here, so the tilt down reads
     const bands = [['#EFA65F', -1300], ['#F3B66C', -500], [GOLD[0], -150], ['#F9D396', 200], [GOLD[1], 420]];
@@ -134,8 +150,8 @@
     paint(ellPts(960, 880 + 2600, 2700, 2600, 120, 2), { wash: '#94B85A', washOp: 255, ink: PAL.ink, sw: 1.2 });
     const lean = ease(seg(t, 14.5, 15.0));
     const sway = n => .035 * Math.sin(bpOf(t) * Math.PI / 2 + n);
-    you(1100, 905, 30, { ...feel('relieved', t, BLUE), view: 'back', noLegs: true, dy: 2, rot: sway(1.3) - .04 * lean });
-    me(820, 905, 30, { ...feel('relieved', t), view: 'back', noLegs: true, dy: 2, rot: sway(0) + .13 * lean, dx: .4 * lean, emote: lean > .6 ? 'hearts' : null, emoteK: seg(t, 14.9, 15.2), emoteAge: t - 14.9 });
+    you(1100, 905, 30, { ...feel('relieved', t, { ...BLUE, emote: null }), view: 'back', noLegs: true, dy: 2, rot: sway(1.3) - .04 * lean });
+    me(820, 905, 30, { ...feel('relieved', t, { emote: null }), view: 'back', noLegs: true, dy: 2, rot: sway(0) + .13 * lean, dx: .4 * lean, emote: lean > .6 ? 'hearts' : null, emoteK: seg(t, 14.9, 15.2), emoteAge: t - 14.9 });
     camEnd();
     if (lt > dur - .3) brushWipe((lt - (dur - .3)) / .6, ['#E8AA38', '#3F8FA8']);
   }

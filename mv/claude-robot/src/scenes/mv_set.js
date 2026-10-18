@@ -16,7 +16,7 @@ const MV = (() => {
   // ---- sky: horizontal washes from top colour to bottom colour, in screen space, plus a soft watercolour bloom ----
   function sky(top, bot, bloom = null, key = 'sky') {
     boilSeed(key);
-    const n = 10;
+    const n = 18;
     for (let i = 0; i < n; i++) {
       const y0 = -80 + i * (H + 160) / n;
       paint(rectPts(-120, y0 - 30, W + 240, (H + 160) / n + 60, 6), { wash: mixCol(top, bot, i / (n - 1)), washOp: 255, ink: null });

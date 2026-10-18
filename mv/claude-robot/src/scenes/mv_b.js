@@ -9,9 +9,11 @@
   function darkClouds(t, dx, side, key) {
     boilSeed(key);
     const xs = side < 0 ? [140, 420, 700, 900] : [1020, 1260, 1520, 1780];
+    xs.forEach((x, i) => { boilSeed(key + 'hi' + i); paint(MV.cloudPts(x + 120 + dx * 1.1, 90, 260, 120, 26, i * 3 + side), { wash: '#7A7D92', washOp: 255, ink: null }); });
+    boilSeed(key);
     xs.forEach((x, i) => {
-      const y = 150 + (i % 2) * 90 + hash(i + side) * 30;
-      paint(MV.cloudPts(x + dx, y, 230, 110, 30, i + side), { wash: i % 2 ? '#5D6075' : '#6B6E84', washOp: 255, fill: '#4A4C5E', fillOp: 60, bleed: .1, ink: PAL.ink, sw: .8 });
+      const y = 300 + (i % 2) * 70 + hash(i + side) * 30;
+      paint(MV.cloudPts(x + dx, y, 240, 125, 30, i + side), { wash: i % 2 ? '#5D6075' : '#6B6E84', washOp: 255, fill: '#4A4C5E', fillOp: 60, bleed: .1, ink: PAL.ink, sw: .8 });
     });
   }
   function s7(t, lt, dur) {
@@ -40,7 +42,7 @@
   const FLOAT = [[700, 430], [1240, 380], [880, 300], [1080, 470], [560, 560], [1380, 560], [960, 250]];
   // each catch: [heart index, time it flies into the jar]
   const CATCH = [[3, 25.72], [2, 25.86], [1, 26.24], [0, 26.36]];
-  function jarTop(t, x, y, u, dyU) { return [x, y + dyU * u - 5.2 * u]; }
+  function jarTop(t, x, y, u, dyU) { return [x, y + dyU * u - 5.8 * u]; }
   function s8(t, lt, dur) {
     MV.sky(...BRIGHT);
     camBegin(960, 540, 1.02);
@@ -54,13 +56,13 @@
     FLOAT.forEach(([hx, hy], i) => {
       const c = CATCH.find(q => q[0] === i), bob = Math.sin(t * 2.4 + i * 1.3) * 12;
       boilSeed('fh' + i);
-      if (!c) { MV.heart(hx, hy + bob, 26); return; }
+      if (!c) { MV.heart(hx, hy + bob, 38); return; }
       if (t >= c[1]) { n++; return; }
       const k = seg(t, c[1] - .25, c[1]), top = jarTop(t, s.x, s.y, u, hop.dy + mm.dy);
       const p = arcPt([hx, hy + bob], top, -60, easeIn(k));
-      MV.heart(p[0], p[1], 26 * (1 - .5 * k));
+      MV.heart(p[0], p[1], 38 * (1 - .5 * k));
     });
-    me(s.x, s.y, u, { ...mm, dy: mm.dy + hop.dy, sq: mm.sq + hop.sq, rot: s.rot, draw: (uu) => MV.jar(0, -1.4 * uu, 3.6 * uu, n, t, 'jar8') });
+    me(s.x, s.y, u, { ...mm, dy: mm.dy + hop.dy, sq: mm.sq + hop.sq, rot: s.rot, draw: (uu) => MV.jar(0, -.6 * uu, 5 * uu, n, t, 'jar8') });
     camEnd();
   }
 
@@ -73,7 +75,7 @@
     camBegin(960, 540, .98);
     MV.sun(1650, 170, 70);
     const g = MV.planet(960, 860, 1300, '#8DBA62', '#5E8446');
-    MV.jar(820, g(820).y, 70, 5, t, 'jar9');
+    MV.jar(400, g(400).y, 110, 5, t, 'jar9');
     // my path: to the left cloud, back right to the second, then hop at the third
     const x = t < 27.3 ? lerp(960, 720, ease(seg(t, 26.7, 27.0))) : lerp(720, 1200, ease(seg(t, 27.3, 27.62))) + 90 * ease(seg(t, 28.0, 28.3));
     const s = g(x), u = 26;
@@ -85,9 +87,9 @@
     // the clouds, then their flights off the planet
     KICKS.forEach(([kt, cx, dir], i) => {
       const cy = g(cx).y - (i === 2 ? 230 : 110);
-      if (t < kt) { MV.rainCloud(cx + Math.sin(t * 2 + i) * 8, cy + Math.sin(t * 3 + i) * 6, 70, t, 1, 'kc' + i); return; }
+      if (t < kt) { MV.rainCloud(cx + Math.sin(t * 2 + i) * 8, cy + Math.sin(t * 3 + i) * 6, 95, t, 1, 'kc' + i); return; }
       const k = seg(t, kt, kt + .55), p = arcPt([cx, cy], [cx + dir * 1100, cy - 420], 220, easeOut(k));
-      if (k < 1) { push(); translate(p[0], p[1]); rotate(dir * k * 5); MV.rainCloud(0, 0, 70 * (1 - .6 * k), t, 1 - k * .5, 'kc' + i); pop(); }
+      if (k < 1) { push(); translate(p[0], p[1]); rotate(dir * k * 5); MV.rainCloud(0, 0, 95 * (1 - .6 * k), t, 1 - k * .5, 'kc' + i); pop(); }
       if (t - kt < .3) { boilSeed('pow' + i); emote('spark', cx - dir * 40, cy + 20, 26 * (1 - (t - kt) / .3) + 8, 1, t - kt); }
     });
     const view = facingL ? { view: 'q', flip: true } : t < 28.7 ? { view: 'q', flip: false } : { view: 'front' };
@@ -105,7 +107,7 @@
     if (k <= 0 || k >= 1) return;
     const x = lerp(from[0], to[0], k), y = lerp(from[1], to[1], k) - Math.sin(k * Math.PI) * 50 + Math.sin(k * 9 + i) * 10;
     boilSeed('wh' + i);
-    const s = 14 * (1 - .3 * k) * Math.min(1, k * 6);
+    const s = 24 * (1 - .3 * k) * Math.min(1, k * 6);
     if (i % 3 === 1) emote('music', x, y, s * .75, 1, t);
     else MV.heart(x, y, s * 1.3);
   }
@@ -119,7 +121,7 @@
     MV.moon(1600, 170, 55, 1, NIGHT[0]);
     const g = MV.planet(960, 900, 1300, '#3F5A50', '#2C4238');
     const u = 36, lean = ease(seg(t, 29.15, 29.6));
-    const bs = g(1150), ms = g(790);
+    const bs = g(1190), ms = g(730);
     const talking = t > 29.6 && t < 31.1, mouthNow = talking ? (Math.floor(t / .1065) % 2 ? 'o' : 'smile') : 'smile';
     const bm = emotions(t, [[0, 'happy', { lookX: -1 }]], { base: BLUE });
     you(bs.x, bs.y, u, { ...bm, mouth: mouthNow, view: 'q', flip: true, rot: bs.rot - .1 * lean, dx: -.9 * lean, seed: 2 });
@@ -150,7 +152,7 @@
       MV.heartFirework(fx, fy, r, t - ft, col, 'fw' + i);
     });
     const g = MV.planet(960, 900, 1300, '#3F5A50', '#2C4238');
-    const u = 36, bs = g(1150), ms = g(790);
+    const u = 36, bs = g(1190), ms = g(730);
     const bm = emotions(t, [[0, 'happy', { lookX: -1 }], [31.9, 'happy', { lookY: -1 }]], { base: BLUE });
     you(bs.x, bs.y, u, { ...bm, ...(t < 31.9 ? { view: 'q', flip: true } : turn(t, 31.9, 32.1, -.125, 0)), rot: bs.rot, seed: 2 });
     const mm = emotions(t, [[0, 'shy'], [32.05, 'hopeful', { lookY: -1 }], [32.95, 'starstruck', { lookY: -1 }], [34.55, 'neutral', { lookY: -1, lookX: 0 }]]);

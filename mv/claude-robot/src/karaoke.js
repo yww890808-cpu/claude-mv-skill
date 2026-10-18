@@ -43,7 +43,7 @@ function kLine(c, L, t, [wa, wb, nx]) {
   const [, , txt, ts] = L, chars = [...txt];
   const out = ease(seg(t, wb - .22, wb));                 // the exit: sink and fade
   if (out >= 1) return;
-  const lift = ease(seg(t, nx, nx + .16));                 // pushed up a row by the next line
+  const lift = isFinite(nx) ? ease(seg(t, nx, nx + .16)) : 0;                 // pushed up a row by the next line
   c.save(); c.translate(960, KY - 100 * lift); c.scale(1 - .24 * lift, 1 - .24 * lift); c.translate(-960, -KY);
   c.font = `${KSIZE}px ${KFONT}`; c.textBaseline = 'middle'; c.textAlign = 'center';
   const ws = chars.map(ch => c.measureText(ch).width + 6), total = ws.reduce((a, b) => a + b, 0);
