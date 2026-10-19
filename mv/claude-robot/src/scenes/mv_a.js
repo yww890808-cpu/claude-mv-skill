@@ -14,10 +14,10 @@
     camBegin(960, 540, Math.pow(z, .25)); MV.stars(t, 46, 1, 3); camEnd();
     camBegin(960, cy, z);
     const g = MV.planet(960, 800, 700, '#6E8F5A', '#4F6E44');
-    const mood = emotions(t, [[0, 'neutral'], [1.5, 'thinking', { lookY: -1, lookX: .1, emote: null }], [3.05, 'relieved', { emote: null }]]);
+    const mood = emotions(t, [[0, 'sad', { emote: null }], [1.5, 'sad', { eyes: 'teary', lookY: -1, lookX: .1, emote: null }], [3.05, 'sad', { eyes: 'closed', mouth: 'frown', lookY: 0, emote: null }]]);
     const hk = ease(seg(t, 3.1, 3.5)), s = g(960);
     me(s.x, s.y, 11, { ...mood, draw: chestHeart(hk, t) });
-    if (hk > 0) glow(s.x, s.y - 3.1 * 11, 60 * (1 + .3 * pulse(t, 5)), '#FF9AB0', .8 * hk);
+    if (hk > 0) glow(s.x, s.y - 3.1 * 11, 50 * (1 + .3 * pulse(t, 5)), '#FF9AB0', .5 * hk);
     const at = toScreen(960, 800 - 44);
     camEnd();
     if (t < 1.1) iris(...at, lerp(0, 1700, easeIn(seg(t, 0, 1.1)) * .6 + seg(t, 0, 1.1) * .4));
@@ -75,8 +75,8 @@
     towerWorld(t, g);
     const s = g(780), u = 24;
     const hop = jump(t, 5.3, 5.75, 2.2);
-    const mood = emotions(t, [[0, 'determined', { lookX: .8 }], [B(7) + .05, 'surprised', { lookX: .8 }], [6.75, 'sad'], [7.15, 'hopeful', { lookY: -1, lookX: .4, emote: null }],
-      [7.7, 'relieved', { eyes: 'closed', mouth: null, aL: .8, aR: .8, emote: 'spark', blush: .2 }], [8.12, 'happy', { lookX: .9, lookY: .7 }]]);
+    const mood = emotions(t, [[0, 'sad', { mouth: 'flat', lookX: .8, lookY: 0, emote: null }], [B(7) + .05, 'surprised', { lookX: .8 }], [6.7, 'cry'], [7.15, 'sad', { eyes: 'teary', lookY: -1, lookX: .4 }],
+      [7.7, 'sad', { eyes: 'closed', mouth: 'frown', aL: .8, aR: .8, lookY: 0 }], [8.12, 'sad', { eyes: 'teary', lookX: .9, lookY: .7, emote: null }]]);
     const view = t < 6.95 ? { view: 'q' } : turn(t, 6.95, 7.12, .125, 0);
     me(s.x, s.y, u, { ...mood, ...view, rot: s.rot, dy: mood.dy + hop.dy, sq: mood.sq + hop.sq, ...(t < 5.75 ? { aL: .9 + .3 * seg(t, 5.2, 5.4), aR: .9 } : {}) });
     // the block balanced on my head, then tossed onto the tower on an arc
@@ -106,7 +106,7 @@
     const bm = emotions(t, [[0, 'excited'], [9.3, 'happy', { aL: .3 + .8 * Math.max(0, Math.sin((t - 9.3) * 9)), aR: .3 }]], { base: BLUE });
     you(bs.x, bs.y, 24, { ...bm, view: t < 9.5 ? 'q' : 'front', flip: true, rot: bs.rot, dy: bm.dy + bj.dy, sq: bm.sq + bj.sq });
     const s = g(780);
-    const mood = emotions(t, [[0, 'happy', { lookX: .9, lookY: .7 }], [9.18, 'surprised', { lookX: 1 }], [10.25, 'starstruck']]);
+    const mood = emotions(t, [[0, 'sad', { eyes: 'teary', lookX: .9, lookY: .7, emote: null }], [9.18, 'surprised', { lookX: 1 }], [9.7, 'happy', { lookX: 1 }], [10.25, 'starstruck']]);
     me(s.x, s.y, 24, { ...mood, view: t > 9.18 && t < 10.2 ? 'q' : 'front', rot: s.rot });
     if (k > .1) glow(960, 520, 900, '#FFD08A', .35 * k);
     camEnd();
